@@ -39,6 +39,8 @@
           <th width="100"> Student Image </th>
           <th width="50">Dob</th>
           <th width="50">Contact</th>
+          <th width="50">Edit</th>
+          <th width="50">Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -56,6 +58,18 @@
 
             <td><%= students[i].contact %>
             </td>
+            <td>
+              <a href="/editStudent/<%= students[i].studentid %>">
+                <button type="button" class="btn btn-primary">Edit</button>
+              </a>
+            </td>
+            <td>
+              <a href="/deleteStudent/<%= students[i].studentid %>" 
+                onclick="return confirm('Are you sure you want to delete this student?')">
+                <button type="button" class="btn btn-danger">Delete</button>
+              </a>
+            </td>
+
           </tr>
           <% } %>
       </tbody>
