@@ -33,7 +33,7 @@
         <% if (student) { %> <!-- Check if student data exists -->
             <div>
                 <p><b>Student Name:</b><br> <%= student.name %></p>
-                <p><b>Student Image:</b><br> <img src = "<%= student.image %>" width="20%"></p>
+                <p><b>Student Image:</b><br> <img src="/images/<%= student.image %>" width="20%"></p>
                 <p><b>Student Dob:</b><br> <%= student.dob.toLocaleDateString('en-CA') %></p>
                 <p><b>Contact:</b><br> <%= student.contact %></p> 
             </div>

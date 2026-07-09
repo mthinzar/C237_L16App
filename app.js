@@ -1,6 +1,18 @@
 const express = require('express');
 const mysql = require('mysql2');
+const multer = require('multer');
 const app = express();
+
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/images'); // Directory to save uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({ storage: storage });
 
 // Create MySQL connection 
 const connection = mysql.createConnection({
@@ -60,27 +72,35 @@ app.get('/student/:id', (req, res) => {
 });
 
 app.get('/addStudent', (req, res) => {
-    res.render('addStudent');
+  res.render('addStudent');
 });
 
-app.post('/addStudent', (req, res) => {
-    // Extract student data from the request body
-    const { name, dob, contact, image } = req.body;
+app.post('/addStudent', upload.single('image'), (req, res) => {
+  // Extract student data from the request body
+  // const { name, dob, contact, image } = req.body;
 
-    const sql = `
+  const { name, dob, contact } = req.body;
+  let image;
+  if (req.file) {
+    image = req.file.filename; // Save only the filename
+  } else {
+    image = null;
+  }
+
+  const sql = `
         INSERT INTO student (name, dob, contact, image)
         VALUES (?, ?, ?, ?)
     `;
 
-    // Insert the new student into the database
-    connection.query(sql, [name, dob, contact, image], (error, results) => {
-        if (error) {
-            console.error("Error adding student:", error);
-            res.send("Error adding student");
-        } else {
-            res.redirect('/');
-        }
-    });
+  // Insert the new student into the database
+  connection.query(sql, [name, dob, contact, image], (error, results) => {
+    if (error) {
+      console.error("Error adding student:", error);
+      res.send("Error adding student");
+    } else {
+      res.redirect('/');
+    }
+  });
 });
 
 // Edit student page
@@ -112,18 +132,24 @@ app.get('/editStudent/:id', (req, res) => {
 
 
 // Update student
-app.post('/editStudent/:id', (req, res) => {
+app.post('/editStudent/:id', upload.single('image'), (req, res) => {
   const studentid = req.params.id;
 
   const { name, dob, contact } = req.body;
+  let image;
+  if (req.file) {
+    image = req.file.filename; // Save only the filename
+  } else {
+    image = null;
+  }
 
   const sql = `
     UPDATE student 
-    SET name = ?, dob = ?, contact = ? 
+    SET name = ?, dob = ?, contact = ?, image = ?
     WHERE studentid = ?
   `;
 
-  connection.query(sql, [name, dob, contact, studentid], (error, results) => {
+  connection.query(sql, [name, dob, contact, image, studentid], (error, results) => {
     if (error) {
       console.error('Error updating student:', error);
       return res.send('Error updating student');
